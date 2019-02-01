@@ -8,3 +8,11 @@ My Shell scripts for managing Oracle database on Linux host
 - Tail database Alert log file
 
 ![screenshot1](https://user-images.githubusercontent.com/47243245/52118646-3366f700-2617-11e9-8081-21d2dbb1c860.png)
+
+--------------------------------------------------------------------------------------------------------------------
+
+# 2. ORAMenu
+
+- Dynamically detects all Oracle instances (from /etc/oratab)
+- Set enviroment variable for selected SID
+
