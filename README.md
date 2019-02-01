@@ -7,3 +7,4 @@ DBMenu
 - Start/Stop Oracle instance
 - Tail database Alert log file
 
+![screenshot1](https://user-images.githubusercontent.com/47243245/52118646-3366f700-2617-11e9-8081-21d2dbb1c860.png)
