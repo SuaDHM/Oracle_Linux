@@ -1,0 +1,23 @@
+#!/bin/bash
+# set -x
+#
+# Set environment variables for selected SID
+#
+
+if [ -f /etc/oratab ]
+then
+echo "Please select your SID to set its environment variables"
+select sid in $(cut -f "1" -d "#" /etc/oratab | awk -F: '{print $1}' | grep -v '^$');
+do
+if [ "X${sid}" == "X" ]
+then
+echo "Invalid selection. Select numbers of respectice SID"
+break
+else
+. /usr/local/bin/oraenv <<< $sid >/dev/null
+break
+fi
+done
+else
+echo "Oracle is not installed on this server"
+fi
