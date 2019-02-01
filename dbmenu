@@ -1,0 +1,188 @@
+#!/bin/bash
+#
+# DB Menu by Suad Adrovic
+# -----------------------
+#
+#
+RED='\033[0;41;30m'
+STD='\033[0;0;39m'
+GRN='\033[0;42;30m'
+YLW='\033[0;43;30m'
+HOST=$(hostname)
+ORATAB=/etc/oratab
+#NO=" -e ${RED}No${STD}"
+
+
+if  [ -f /etc/oratab ] ; then
+        ORATAB=/etc/oratab
+else
+        echo "oratab does not exist"
+        exit 1
+fi;
+ 
+# ----------------------------------
+pause(){
+  read -p "Press [Enter] key to continue..." fackEnterKey
+}
+
+one(){
+	echo "Starting Database"
+	echo "================="
+	echo ""
+	read -p "Enter Database name: " db1
+	read -p "Enter Database home: " home1
+	export ORACLE_SID=${db1^^}
+        export ORACLE_HOME=$home1
+	export PATH=$PATH:$ORACLE_HOME/bin
+	sqlplus -s "/ as sysdba" << EOF
+WHENEVER OSERROR EXIT 9;
+WHENEVER SQLERROR EXIT SQL.SQLCODE;
+startup;
+exit;
+EOF
+sql_return_code=$?
+    if [ $sql_return_code = 0  ]
+	then
+	echo " "
+        echo -e "Database $ORACLE_SID is ${GRN}started${STD}"
+        echo " "
+        echo " "
+	else
+	echo " "
+        echo -e "${RED}Database $ORACLE_SID NOT started. Check database alert log file!${STD}"
+        echo " "
+        echo " "
+	fi
+	pause
+}
+ 
+# ---------------------------- 
+two(){
+        echo "Stopping Database"
+        echo "================="
+        echo ""
+        read -p "Enter Database name: " db1
+        read -p "Enter Database home: " home1
+        export ORACLE_SID=${db1^^}
+        export ORACLE_HOME=$home1
+        export PATH=$PATH:$ORACLE_HOME/bin
+        sqlplus -s "/ as sysdba" << EOF
+shutdown immediate;
+exit;
+EOF
+	echo " "
+        echo -e "Database $ORACLE_SID ${RED}stopped${STD}"
+        echo " "
+	echo " "
+	pause
+}
+
+three(){
+	echo "Tail Database Alert Log File"
+	echo "============================"
+	echo ""
+	read -p "Enter Database name: " db2
+	read -p "Enter Database Base directory: " bdir 
+	ALERT="$(find $bdir -name alert_${db2^^}.log)"
+if [ -z "$ALERT" ];
+then
+echo " "
+echo " "
+echo "##########################################################################################"
+echo -e "Location [${RED}$bdir${STD}] is not [${YLW}$db2${STD}] Database Base directory!!!"
+echo "##########################################################################################"
+echo " "
+echo " "
+pause
+else
+	echo " "
+	tail -100 $ALERT
+	echo " "
+	echo " "
+	echo  "-------------------------------------------------"
+	echo -e "${YLW}Database ${db2^^} Alert Log file:${STD} "
+	echo $ALERT
+	echo  "-------------------------------------------------"
+	echo " "
+	echo " "
+	pause
+fi
+} 
+#
+show_menus() {
+        clear
+#
+echo ""
+echo -e "                                       Server: ${YLW}$HOST${STD}"
+echo ""
+echo "                                       The following databases are available:"
+echo "                                      ########################################"
+echo ""
+echo "                          ORACLE_SID        ORACLE_HOME                                   Running?"
+echo "                          -------------     -----------------------------------------     ----------"
+echo ""
+DBASES=`cat $ORATAB |grep -vi asm | awk 'BEGIN {FS=":"} $1 !~/^#/ {printf("%s:%s ",$1,$2)}'`
+#
+#
+for name in $DBASES
+do
+DBSID=`echo $name | awk 'BEGIN {FS=":"} {print $1}'`
+DBHOME=`echo $name | awk 'BEGIN {FS=":"} {print $2}'`
+#if  [ -f ${DBHOME}/dbs/sgadef${DBSID}.dbf ]
+if [ $DBSID = "GCAgentHome" ]
+then
+ps -ef|grep emagent|grep -v grep >/dev/null
+else
+ps -ef|grep -w ora_pmon_${DBSID}|grep -v grep > /dev/null
+fi
+if [ $? = 0 ]
+then
+        DBRUN="${GRN}Yes${STD}"
+else
+        DBRUN="${RED}No${STD}" 
+fi
+        echo -e "                          $DBSID            $DBHOME         $DBRUN"
+done
+
+#show_menus() {
+#	clear
+	echo " "
+	echo " "
+	echo " "
+	echo "                                               ~~~~~~~~~~~~~~~~~~~~~"	
+	echo "                                                  D B  - M E N U"
+	echo "                                               ~~~~~~~~~~~~~~~~~~~~~"
+	echo " "
+	echo "                                                 1. Start Database"
+	echo "                                                 2. Stop Database"
+	echo "                                                 3. Tail Alert Log"
+	echo "                                                 4. Exit"
+	echo " "
+ 	echo " "
+}
+# ----------------------------------------- 
+read_options(){
+	local choice
+	read -p "                                               Enter choice [1 - 4] " choice
+	echo ""
+	echo ""
+	case $choice in
+		1) one ;;
+		2) two ;;
+                3) three ;;
+		4) clear && exit 0;;
+		*) echo -e "${RED}Error...${STD} [$choice] is invalid input!" && sleep 2
+	esac
+}
+ 
+# ----------------------------------------------
+# ----------------------------------------------
+trap '' SIGINT SIGQUIT SIGTSTP
+ 
+# -----------------------------------
+while true
+do
+ 
+	show_menus
+	read_options
+done
