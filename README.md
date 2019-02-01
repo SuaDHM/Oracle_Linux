@@ -9,6 +9,9 @@ My Shell scripts for managing Oracle database on Linux host
 
 ![screenshot1](https://user-images.githubusercontent.com/47243245/52118646-3366f700-2617-11e9-8081-21d2dbb1c860.png)
 
+
+https://www.youtube.com/watch?v=4QvIknRefAs
+
 --------------------------------------------------------------------------------------------------------------------
 
 # 2. ORAMenu
