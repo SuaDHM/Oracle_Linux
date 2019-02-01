@@ -16,3 +16,5 @@ My Shell scripts for managing Oracle database on Linux host
 - Dynamically detects all Oracle instances (from /etc/oratab)
 - Set enviroment variable for selected SID
 
+
+![screenshot2](https://user-images.githubusercontent.com/47243245/52119153-7e353e80-2618-11e9-897a-e0957bbe0a94.png)
